@@ -9,7 +9,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import com.ontalsoft.efs.exporter.reader.BinReader;
+import com.ontalsoft.efs.exporter.io.BinReader;
 import com.ontalsoft.efs.exporter.swing.SwingUtil;
 
 public class Events{

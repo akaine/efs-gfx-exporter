@@ -39,6 +39,11 @@
             <artifactId>commons-codec</artifactId>
             <version>1.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-imaging</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -95,6 +100,13 @@
             </resource>
         </resources>
     </build>
+    
+    <repositories>
+        <repository>
+            <id>ImageJ Public</id>
+        	<url>http://maven.imagej.net/content/repositories/public/</url>
+        </repository>
+    </repositories>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

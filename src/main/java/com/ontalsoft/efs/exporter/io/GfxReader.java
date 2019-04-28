@@ -1,26 +1,69 @@
-package com.ontalsoft.efs.exporter.reader;
+package com.ontalsoft.efs.exporter.io;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import org.apache.commons.imaging.formats.pcx.PcxImageParser;
+
 import com.ontalsoft.efs.exporter.GfxFileSpecs;
 
-public class BinReader extends GfxReader {
+import lombok.Getter;
+
+@Getter
+public class GfxReader {
 
     public static final byte ALPHA_BYTE = (byte)0x00;
 
-    public BinReader(final String basePath, final GfxFileSpecs gfxFile) {
-        super(basePath, gfxFile);
+    private final String basePath;
+    private final GfxFileSpecs gfxFileSpecs;
+    private final String absolutePath;
+    private final byte[][] rgbPalette;
+
+    private byte[][] gfxData;
+    private BufferedImage image;
+
+    public GfxReader(final GfxFileSpecs gfxFileSpecs, final String basePath, final byte[][] rgbPalette) {
+        this.basePath = basePath;
+        this.gfxFileSpecs = gfxFileSpecs;
+        this.rgbPalette = rgbPalette;
+        this.absolutePath = getFilePath();
+
+        read();
     }
 
-    @Override
-    public byte[][] read() throws IOException {
-        final byte[][] framesBytes = new byte[gfxFileSpecs.getFrameCount()][gfxFileSpecs.getFrameHeight() * gfxFileSpecs.getFrameWidth()];
+    private void read() {
+        switch(gfxFileSpecs.getType()) {
+            case BIN:
+                gfxData = readBinary();
+                break;
+            case PCX:
+                image = readImage();
+                break;
+        }
+    }
 
+    public BufferedImage readImage() {
         try {
-            final byte[] fileBytes = Files.readAllBytes(Paths.get(getFilePath()));
+            final PcxImageParser pcxImageParser = new PcxImageParser();
+            final BufferedImage pcxImage = pcxImageParser.getBufferedImage(new File(absolutePath), null);
+
+            return pcxImage;
+        }
+        catch(final Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
+    }
+
+    public byte[][] readBinary() {
+        try {
+            final byte[][] framesBytes = new byte[gfxFileSpecs.getFrameCount()][gfxFileSpecs.getFrameHeight() * gfxFileSpecs.getFrameWidth()];
+
+            final byte[] fileBytes = Files.readAllBytes(Paths.get(absolutePath));
 
             if(gfxFileSpecs.isHexagonal()) {
                 for(int i = 0; i < gfxFileSpecs.getFrameCount(); i++) {
@@ -37,11 +80,12 @@ public class BinReader extends GfxReader {
                             gfxFileSpecs.getFrameWidth() * gfxFileSpecs.getFrameHeight() * (i + 1)));
                 }
             }
+            return framesBytes;
         }
         catch(final IOException e) {
-            throw new IOException(e);
+            e.printStackTrace(System.out);
         }
-        return framesBytes;
+        return null;
     }
 
     private byte[] raw2sqaure(final byte[] bitmapBytes) {
@@ -140,5 +184,22 @@ public class BinReader extends GfxReader {
             squareBitmap[offset] = ALPHA_BYTE;
             offset++;
         }
+    }
+
+    /**
+     * Returns an absolute path of the file provided during initialization
+     *
+     * @return file absolute path
+     */
+    private String getFilePath() {
+        final StringBuilder sb = new StringBuilder(basePath);
+        sb.append(File.separator);
+        sb.append(gfxFileSpecs.getDir());
+        sb.append(File.separator);
+        sb.append(gfxFileSpecs.getName());
+        sb.append('.');
+        sb.append(gfxFileSpecs.getType().name());
+
+        return sb.toString();
     }
 }

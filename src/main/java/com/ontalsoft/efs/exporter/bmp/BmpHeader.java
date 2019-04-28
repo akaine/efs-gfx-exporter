@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 import lombok.Getter;
 
-public class BMPHeader {
+public class BmpHeader {
 
     private final static int FILEHEADER_SIZE = 14;
     private final static int INFOHEADER_SIZE = 40;
@@ -14,7 +14,7 @@ public class BMPHeader {
     private int bfSize = 0;
     private final int bfReserved1 = 0;
     private final int bfReserved2 = 0;
-    private final int bfOffBits = FILEHEADER_SIZE + INFOHEADER_SIZE + PALETTE_SIZE;
+    private final int bfOffBits = FILEHEADER_SIZE + INFOHEADER_SIZE + PALETTE_SIZE;  // 1078 = x436
 
     private final int biSize = INFOHEADER_SIZE;
     private int biWidth = 0;
@@ -33,7 +33,7 @@ public class BMPHeader {
     @Getter
     private final int pad;
 
-    public BMPHeader(final int biWidth, final int biHeight, final byte[][] rgbBytes) {
+    public BmpHeader(final int biWidth, final int biHeight, final byte[][] rgbBytes) {
         this.pad = (4 - biWidth % 4) % 4;
         this.biWidth = biWidth;
         this.biHeight = biHeight;

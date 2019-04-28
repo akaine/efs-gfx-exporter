@@ -1,29 +1,55 @@
-package com.ontalsoft.efs.exporter.writer;
+package com.ontalsoft.efs.exporter.io;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
+import javax.imageio.ImageIO;
+
 import com.ontalsoft.efs.exporter.GfxFileSpecs;
-import com.ontalsoft.efs.exporter.bmp.BMPHeader;
+import com.ontalsoft.efs.exporter.bmp.BmpHeader;
 
-public class BmpWriter extends GfxWriter {
+public class BmpWriter {
 
-    public BmpWriter(final String basePath, final GfxFileSpecs gfxFileSpecs, final byte[][] rgbPalette) {
-        super(basePath, gfxFileSpecs, rgbPalette);
+    private final GfxReader gfxReader;
+    private final String absolutePath;
+    private final GfxFileSpecs gfxFileSpecs;
+    private final byte[][] rgbPalette;
+
+    public BmpWriter(final GfxReader gfxReader) {
+        this.gfxReader = gfxReader;
+        this.absolutePath = getFilePath(gfxReader.getGfxFileSpecs(), gfxReader.getBasePath());
+        this.gfxFileSpecs = gfxReader.getGfxFileSpecs();
+        this.rgbPalette = gfxReader.getRgbPalette();
+    }
+
+    public void write() throws Exception {
+        switch(gfxFileSpecs.getType()) {
+            case BIN:
+                writeBinary(gfxReader.getGfxData());
+                break;
+            case PCX:
+                writeImage(gfxReader.getImage());
+                break;
+        }
+    }
+
+    private void writeImage(final BufferedImage image) throws IOException {
+        ImageIO.write(image, "bmp", new File(absolutePath));
     }
 
     /**
      * https://engineering.purdue.edu/ece264/17au/hw/HW15
      */
-    @Override
-    public byte[][] write(final byte[][] gfxData) throws IOException {
+    private void writeBinary(final byte[][] gfxData) throws IOException {
         final int[] bmpDimmsConfig = getBmpDimmsConfig(gfxFileSpecs);
-        final BMPHeader bmpHeader = new BMPHeader(bmpDimmsConfig[0], bmpDimmsConfig[1], rgbPalette);
+        final BmpHeader bmpHeader = new BmpHeader(bmpDimmsConfig[0], bmpDimmsConfig[1], rgbPalette);
         final byte[] bmpHeaderBytes = bmpHeader.getHeaderBytes();
         final int pad = bmpHeader.getPad();
 
-        try(final RandomAccessFile raf = new RandomAccessFile(getFilePath(), "rw");) {
+        try(final RandomAccessFile raf = new RandomAccessFile(absolutePath, "rw");) {
 
             raf.write(bmpHeaderBytes);
 
@@ -62,8 +88,6 @@ public class BmpWriter extends GfxWriter {
         catch(final Exception e) {
             e.printStackTrace(System.out);
         }
-
-        return null;
     }
 
     /**
@@ -94,5 +118,22 @@ public class BmpWriter extends GfxWriter {
             }
         }
         return inverted;
+    }
+
+    /**
+     * Returns an absolute path of the file provided during initialization
+     *
+     * @return file absolute path
+     */
+    private String getFilePath(final GfxFileSpecs gfxFileSpecs, final String basePath) {
+        final StringBuilder sb = new StringBuilder(basePath);
+        sb.append(File.separator);
+        sb.append(gfxFileSpecs.getDir());
+        sb.append(File.separator);
+        sb.append(gfxFileSpecs.getName());
+        sb.append('.');
+        sb.append("bmp");
+
+        return sb.toString();
     }
 }

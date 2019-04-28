@@ -5,20 +5,18 @@ import java.util.EnumSet;
 import org.apache.commons.io.IOUtils;
 
 import com.ontalsoft.efs.exporter.GfxFileSpecs;
-import com.ontalsoft.efs.exporter.reader.BinReader;
-import com.ontalsoft.efs.exporter.reader.GfxReader;
-import com.ontalsoft.efs.exporter.writer.BmpWriter;
-import com.ontalsoft.efs.exporter.writer.GfxWriter;
+import com.ontalsoft.efs.exporter.io.BmpWriter;
+import com.ontalsoft.efs.exporter.io.GfxReader;
 
 public class TestAny {
 
     public static final String basePath = "e:/_code/_projects/efs_phoenix/EFS";
 
-    public static final byte ALPHA_BYTE = (byte)0x00;
-
     final static byte[][] rgbPalette = getRgbPalette();
 
     public static void main(final String[] args) throws IOException {
+
+        //exportFile(GfxFileSpecs.TERRAIN_SHIELD_EFFECT);
 
         EnumSet.allOf(GfxFileSpecs.class).forEach(gfxFileSpecs -> {
             exportFile(gfxFileSpecs);
@@ -27,11 +25,9 @@ public class TestAny {
 
     private static void exportFile(final GfxFileSpecs gfxFileSpecs) {
         try {
-            final GfxReader reader = new BinReader(basePath, gfxFileSpecs);
-            final byte[][] gfxData = reader.read();
-
-            final GfxWriter writer = new BmpWriter(basePath, gfxFileSpecs, rgbPalette);
-            writer.write(gfxData);
+            final GfxReader reader = new GfxReader(gfxFileSpecs, basePath, rgbPalette);
+            final BmpWriter writer = new BmpWriter(reader);
+            writer.write();
         }
         catch(final Exception e) {
             e.printStackTrace(System.out);
