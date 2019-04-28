@@ -14,7 +14,7 @@ public class Operations{
 		Path path = Paths.get(sPath);
 		main.appendToLog("- Checking EFS directories... ");
 		if(Files.exists(path)){
-			Set<String> binFileNames = EnumFile.listAllBinNames();
+			Set<String> binFileNames = GfxFileSpecs.listAllBinNames();
 			int binFileNamesSize = binFileNames.size();
 			
 			try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path)){

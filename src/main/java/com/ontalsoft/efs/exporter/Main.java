@@ -18,7 +18,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.ontalsoft.efs.exporter.swing.SwingUtil;
 
-public class Main{
+public class Main {
 
     public static final String MAIN_FRAME = "mainFrame";
     public static final String PANEL_MAIN = "panelMain";
@@ -26,32 +26,34 @@ public class Main{
     public static final String TEXT_BINPATH = "textBinPath";
     public static final String TEXT_BMPPATH = "textBmpPath";
 
-    private Map<String,Component> componentMap;
+    private Map<String, Component> componentMap;
     private JTextArea textLog;
 
-    public Main(){
+    public Main() {
         initialize();
     }
 
-    public void appendToLog(final String text){
-        this.textLog.setText(this.textLog.getText()+text);
+    public void appendToLog(final String text) {
+        this.textLog.setText(this.textLog.getText() + text);
         this.textLog.setCaretPosition(this.textLog.getCaretPosition());
     }
 
-    public static void main(final String[] args){
-        try{
-            for(final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()){
-                if("Windows".equals(info.getName())){
+    public static void main(final String[] args) {
+        try {
+            for(final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if("Windows".equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        }catch(final Exception e){}
+        }
+        catch(final Exception e) {
+        }
 
-        EventQueue.invokeLater(new Runnable(){
+        EventQueue.invokeLater(new Runnable() {
             @Override
-            public void run(){
-                try{
+            public void run() {
+                try {
                     final Main main = new Main();
                     final JFrame mainFrame = SwingUtil.getComponentByName(main.getComponentMap(), Main.MAIN_FRAME);
                     mainFrame.setVisible(true);
@@ -59,14 +61,15 @@ public class Main{
                     //scanBinDirectory("e:/_CODE/_PROJECTS/efs_phoenix/EFS/BIN/", main);
                     Operations.scanBinDirectory("", main);
 
-                }catch(final Exception e){
+                }
+                catch(final Exception e) {
                     e.printStackTrace();
                 }
             }
         });
     }
 
-    private void initialize(){
+    private void initialize() {
         final Main windowMain = this;
         final Events events = new Events();
 
@@ -85,9 +88,9 @@ public class Main{
 
         final JButton btnBinPathBrowse = new JButton("Browse...");
         btnBinPathBrowse.setBounds(405, 7, 79, 23);
-        btnBinPathBrowse.addActionListener(new ActionListener(){
+        btnBinPathBrowse.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(final ActionEvent e){
+            public void actionPerformed(final ActionEvent e) {
                 events.browseBinPath(e, windowMain);
             }
         });
@@ -114,9 +117,9 @@ public class Main{
         final JButton btnBin2Bmp = new JButton("Export graphics BINs to BMPs");
         btnBin2Bmp.setBounds(10, 68, 230, 23);
         btnBin2Bmp.setEnabled(false);
-        btnBin2Bmp.addActionListener(new ActionListener(){
+        btnBin2Bmp.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(final ActionEvent e){
+            public void actionPerformed(final ActionEvent e) {
                 events.convertBinsToBmps(e, windowMain);
             }
         });
@@ -154,15 +157,15 @@ public class Main{
         componentMap = SwingUtil.createComponentMap(mainFrame);
     }
 
-    public Map<String,Component> getComponentMap(){
+    public Map<String, Component> getComponentMap() {
         return componentMap;
     }
 
-    public JTextArea getTextLog(){
+    public JTextArea getTextLog() {
         return textLog;
     }
 
-    public void setTextLog(final JTextArea textLog){
+    public void setTextLog(final JTextArea textLog) {
         this.textLog = textLog;
     }
 }

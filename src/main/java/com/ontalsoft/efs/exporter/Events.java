@@ -9,7 +9,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import com.ontalsoft.efs.exporter.bin.BinReader;
+import com.ontalsoft.efs.exporter.reader.BinReader;
 import com.ontalsoft.efs.exporter.swing.SwingUtil;
 
 public class Events{
@@ -43,8 +43,8 @@ public class Events{
 	}
 	
 	public void convertBinsToBmps(ActionEvent e, Main main){
-		EnumFile[] enumFiles = EnumFile.values();
-		Set<String> binFileNames = EnumFile.listAllBinNames();
+		GfxFileSpecs[] enumFiles = GfxFileSpecs.values();
+		Set<String> binFileNames = GfxFileSpecs.listAllBinNames();
 		
 		JTextField textBinPath = SwingUtil.getComponentByName(main.getComponentMap(), Main.TEXT_BINPATH);
 		JTextField textBmpPath = SwingUtil.getComponentByName(main.getComponentMap(), Main.TEXT_BMPPATH);
@@ -52,7 +52,7 @@ public class Events{
 		try{
 			BinReader binReader;
 			byte[][] binData;
-			for(EnumFile enumFile : enumFiles){
+			for(GfxFileSpecs enumFile : enumFiles){
 				binReader = new BinReader(textBinPath.getText(), enumFile);
 				binData = binReader.readTilesBytes();
 			}
